@@ -1,0 +1,23 @@
+{
+  "name": "ind-slot-checker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "tsc && node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "grammy": "^1.8.2",
+    "lowdb": "^3.0.0",
+    "puppeteer": "^13.7.0",
+    "typescript": "^4.6.4"
+  },
+  "devDependencies": {
+    "prettier": "^2.6.2"
+  }
+}
