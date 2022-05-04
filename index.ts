@@ -5,7 +5,8 @@ import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-console.log(__dirname);
+const pollInterval: number = Number(process.env.POLL_INTERVAL) || 5;
+
 interface UserData {
   id: number;
   lastResult?: boolean;
@@ -41,7 +42,9 @@ setInterval(async () => {
     const [result, screenshot] = await checkForSlots();
     const users = db.data.users;
 
-    console.log(`Sending notifications for result: "${result}"...`);
+    console.log(
+      `Sending notifications for ${users.length} users: "${result}"...`
+    );
     if (screenshot) {
       await Promise.all(
         users.map(async (user) => {
@@ -57,7 +60,7 @@ setInterval(async () => {
     }
     db.data.users = users.map((x) => ({ ...x, lastResult: result }));
   }
-}, 60000);
+}, pollInterval * 60000);
 
 bot.start();
 console.log("Bot is started");
@@ -91,20 +94,12 @@ const checkForSlots = async (): Promise<
     await page.select("#plhMain_cboVisaCategory", "8");
     await page.click("#plhMain_btnSubmit");
     try {
-      await page.waitForFunction(
-        () => {
-          const message = document.getElementById("plhMain_lblMsg");
-          return (
-            message &&
-            message.textContent === "No date(s) available for appointment."
-          );
-        },
-        { timeout: 10000 }
-      );
-      return [false, await page.screenshot()];
-    } catch (e) {
-      console.log(e);
+      await page.waitForSelector("#plhMain_repAppVisaDetails_tbxFName_0", {
+        timeout: 30000,
+      });
       return [true, await page.screenshot()];
+    } catch (e) {
+      return [false, await page.screenshot()];
     }
   } catch (e) {
     console.error("An error has occurred", e);
